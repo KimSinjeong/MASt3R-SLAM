@@ -7,6 +7,7 @@ import os
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 has_cuda = torch.cuda.is_available()
+is_building_docker = os.environ.get('DOCKER_BUILDING', False)
 
 include_dirs = [
     os.path.join(ROOT, "mast3r_slam/backend/include"),
@@ -21,7 +22,7 @@ extra_compile_args = {
     "cxx": ["-O3"],
 }
 
-if has_cuda:
+if has_cuda or is_building_docker:
     from torch.utils.cpp_extension import CUDAExtension
 
     sources.append("mast3r_slam/backend/src/gn_kernels.cu")
