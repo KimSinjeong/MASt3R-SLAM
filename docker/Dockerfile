@@ -23,8 +23,6 @@ RUN apt update && \
     apt install -y --fix-missing \
     librealsense2-dkms \
     librealsense2-utils
-    # librealsense2-dev \
-    # librealsense2-dbg
 
 # Install python3.11
 RUN add-apt-repository ppa:deadsnakes/ppa
@@ -61,7 +59,6 @@ RUN if test -f "/usr/lib/x86_64-linux-gnu/libGL.so"; then \
     else \
     ln -s /usr/lib/x86_64-linux-gnu/libGL.so.1 /usr/lib/x86_64-linux-gnu/libGL.so; \
     fi
-# RUN ln -s /usr/lib/x86_64-linux-gnu/libGL.so.1 /usr/lib/x86_64-linux-gnu/libGL.so
 
 # Env vars for the nvidia-container-runtime.
 ENV NVIDIA_VISIBLE_DEVICES=all
@@ -70,12 +67,9 @@ ENV NVIDIA_DRIVER_CAPABILITIES=all
 WORKDIR /MASt3R-SLAM/
 # Warning: Currently working with only Turing and later architectures 
 ENV TORCH_CUDA_ARCH_LIST="Turing Ampere+Tegra Ampere Ada Hopper"
-# ENV CUDA_ARCHITECTURES=all
 RUN python -m pip install -e thirdparty/mast3r && \
-    python -m pip install -e thirdparty/in3d
-RUN python -c "import os; print('Running inside Docker' if os.path.exists('/.dockerenv') else 'Not running inside Docker')" \
-    && cat /proc/1/cgroup \
-    && python -m pip install --no-build-isolation -e .
+    python -m pip install -e thirdparty/in3d && \
+    python -m pip install --no-build-isolation -e .
 
 ENV DOCKER_BUILDING=0
 
@@ -83,5 +77,3 @@ RUN mkdir -p checkpoints/
 RUN wget https://download.europe.naverlabs.com/ComputerVision/MASt3R/MASt3R_ViTLarge_BaseDecoder_512_catmlpdpt_metric.pth -P checkpoints/
 RUN wget https://download.europe.naverlabs.com/ComputerVision/MASt3R/MASt3R_ViTLarge_BaseDecoder_512_catmlpdpt_metric_retrieval_trainingfree.pth -P checkpoints/
 RUN wget https://download.europe.naverlabs.com/ComputerVision/MASt3R/MASt3R_ViTLarge_BaseDecoder_512_catmlpdpt_metric_retrieval_codebook.pkl -P checkpoints/
-
-# CMD ["python", "-m", "pip", "install", "--no-build-isolation", "-e", ".", "&&", "bash"]
